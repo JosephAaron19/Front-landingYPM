@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Sparkles, ZoomIn } from 'lucide-react';
-import { ImageWithFallback } from '../figma/ImageWithFallback';
+import { ImageWithFallback, resolveImageUrl } from '../figma/ImageWithFallback';
 
 export default function Gallery({ galleryList }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -50,7 +50,7 @@ export default function Gallery({ galleryList }) {
             {/* Ambient Background Blur to fill space */}
             <div className="absolute inset-0 filter blur-3xl opacity-20 pointer-events-none scale-110">
               <img 
-                src={galleryList[activeIndex]} 
+                src={resolveImageUrl(galleryList[activeIndex])} 
                 alt="blur background" 
                 className="w-full h-full object-cover"
               />
@@ -106,7 +106,7 @@ export default function Gallery({ galleryList }) {
               }`}
             >
               <img 
-                src={image} 
+                src={resolveImageUrl(image)} 
                 alt={`thumbnail ${index + 1}`} 
                 className="w-full h-full object-cover"
               />

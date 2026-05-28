@@ -2,7 +2,21 @@ import React from 'react';
 import { Users, Shield, Flame, Sparkles } from 'lucide-react';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 
-export default function About({ aboutImage }) {
+export default function About({ aboutImage, aboutInfo, valoresList = [] }) {
+  const getIcon = (name) => {
+    switch (name) {
+      case 'Flame': return <Flame className="w-8 h-8 text-[#FFD700] shrink-0" />;
+      case 'Users': return <Users className="w-8 h-8 text-[#FFD700] shrink-0" />;
+      case 'Shield': return <Shield className="w-8 h-8 text-[#FFD700] shrink-0" />;
+      default: return <Sparkles className="w-8 h-8 text-[#FFD700] shrink-0" />;
+    }
+  };
+
+  const displayValores = valoresList.length > 0 ? valoresList : [
+    { titulo: 'Garra Incondicional', descripcion: 'Lucha inquebrantable hasta el pitido final.', icono: 'Flame' },
+    { titulo: 'Excelencia y Honor', descripcion: 'Formación deportiva y personal íntegra.', icono: 'Shield' }
+  ];
+
   return (
     <section id="nosotras" className="py-24 px-4 bg-gradient-to-b from-[#121212] via-black to-[#0c0c0c] relative overflow-hidden border-t border-[#FFD700]/5">
       {/* Background Tech Grids */}
@@ -17,55 +31,55 @@ export default function About({ aboutImage }) {
             {/* Tag */}
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFD700]/10 border border-[#FFD700]/20 text-[10px] uppercase tracking-widest text-[#FFD700]">
               <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-              Nuestra Historia
+              {aboutInfo?.subtitulo || 'Nuestra Historia'}
             </div>
 
             {/* Title */}
             <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tight leading-none">
-              Sobre <span className="text-[#FFD700]">Nosotras</span>
+              {aboutInfo?.titulo || 'Sobre Nosotras'}
             </h2>
             <div className="w-16 h-1 bg-[#FFD700] rounded-full mb-6"></div>
 
             {/* Paragraphs */}
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              El <strong>Club Deportivo Yanapuma</strong> es un histórico equipo de fútbol femenino de Iquitos (Loreto, Perú). 
-              Nace como un inspirador proyecto social y deportivo para rescatar y potenciar el talento de jóvenes loretanas que se habían quedado sin respaldo profesional. 
-              Refundado en 2025 por empresarios loretanos comprometidos con el deporte del oriente, el equipo emprendió una campaña brillante.
-            </p>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              Tras coronarse campeonas nacionales absolutas de la Liga de Ascenso en la hazaña histórica de Huaral, sellaron su boleto a la Primera División, 
-              convirtiéndose en el primer equipo en la historia de la región Loreto en subir a la máxima categoría del fútbol profesional peruano (Liga Femenina FPF).
-            </p>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              El término <strong>"Yanapuma"</strong> representa a la mítica pantera negra de la Amazonía: sinónimo de agilidad letal, fuerza y sigilo inquebrantable. 
-              Portando con orgullo el negro y oro, nuestras "guerreras yanapumas" sirven de vitrina para destacar figuras locales y aportar valores a la Selección Peruana juvenil.
-            </p>
+            {aboutInfo?.contenido ? (
+              <div className="text-zinc-300 text-sm leading-relaxed space-y-4">
+                {aboutInfo.contenido.split('\n').map((para, pIdx) => (
+                  <p key={pIdx}>{para}</p>
+                ))}
+              </div>
+            ) : (
+              <>
+                <p className="text-zinc-300 text-sm leading-relaxed">
+                  El <strong>Club Deportivo Yanapuma</strong> es un histórico equipo de fútbol femenino de Iquitos (Loreto, Perú). 
+                  Nace como un inspirador proyecto social y deportivo para rescatar y potenciar el talento de jóvenes loretanas que se habían quedado sin respaldo profesional. 
+                  Refundado en 2025 por empresarios loretanos comprometidos con el deporte del oriente, el equipo emprendió una campaña brillante.
+                </p>
+                <p className="text-zinc-300 text-sm leading-relaxed">
+                  Tras coronarse campeonas nacionales absolutas de la Liga de Ascenso en la hazaña histórica de Huaral, sellaron su boleto a la Primera División, 
+                  convirtiéndose en el primer equipo en la historia de la región Loreto en subir a la máxima categoría del fútbol profesional peruano (Liga Femenina FPF).
+                </p>
+              </>
+            )}
 
             {/* Glassmorphic Value Grid (FUT Cockpit theme) */}
             <div className="grid sm:grid-cols-2 gap-4 pt-4">
-              <div className="bg-[#0b0b0b] border border-zinc-900 rounded-xl p-4 flex gap-3 hover:border-[#FFD700]/30 transition-colors">
-                <Flame className="w-8 h-8 text-[#FFD700] shrink-0" />
-                <div>
-                  <h4 className="font-extrabold text-xs text-white uppercase tracking-wider">Garra Incondicional</h4>
-                  <p className="text-[10px] text-zinc-500 mt-1">Lucha inquebrantable hasta el pitido final.</p>
+              {displayValores.map((val, idx) => (
+                <div key={idx} className="bg-[#0b0b0b] border border-zinc-900 rounded-xl p-4 flex gap-3 hover:border-[#FFD700]/30 transition-colors">
+                  {getIcon(val.icono)}
+                  <div>
+                    <h4 className="font-extrabold text-xs text-white uppercase tracking-wider">{val.titulo}</h4>
+                    <p className="text-[10px] text-zinc-500 mt-1">{val.descripcion}</p>
+                  </div>
                 </div>
-              </div>
-
-              <div className="bg-[#0b0b0b] border border-zinc-900 rounded-xl p-4 flex gap-3 hover:border-[#FFD700]/30 transition-colors">
-                <Shield className="w-8 h-8 text-[#FFD700] shrink-0" />
-                <div>
-                  <h4 className="font-extrabold text-xs text-white uppercase tracking-wider">Excelencia y Honor</h4>
-                  <p className="text-[10px] text-zinc-500 mt-1">Formación deportiva y personal íntegra.</p>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Mission bar */}
             <div className="flex items-center gap-4 bg-gradient-to-r from-[#0b0b0b] to-transparent border-l-2 border-[#FFD700] p-4 mt-6">
               <Users className="w-10 h-10 text-[#FFD700]" />
               <div>
-                <h3 className="font-extrabold text-xs text-white uppercase tracking-wider">Nuestra Gran Misión</h3>
-                <p className="text-[11px] text-zinc-500 mt-0.5">Empoderar y profesionalizar el fútbol femenino en toda la región.</p>
+                <h3 className="font-extrabold text-xs text-white uppercase tracking-wider">{aboutInfo?.mision_titulo || 'Nuestra Gran Misión'}</h3>
+                <p className="text-[11px] text-zinc-500 mt-0.5">{aboutInfo?.mision_descripcion || 'Empoderar y profesionalizar el fútbol femenino en toda la región.'}</p>
               </div>
             </div>
           </div>
@@ -93,7 +107,9 @@ export default function About({ aboutImage }) {
               {/* Badge text on image */}
               <div className="absolute bottom-6 left-6 z-20">
                 <span className="text-[9px] uppercase tracking-widest text-[#FFD700] font-black">Registro Fotográfico</span>
-                <h4 className="text-lg font-bold text-white uppercase mt-1">El Plantel Unido - Iquitos</h4>
+                <h4 className="text-lg font-bold text-white uppercase mt-1">
+                  {aboutInfo?.pie_imagen || "El Plantel Unido - Iquitos"}
+                </h4>
               </div>
             </div>
           </div>

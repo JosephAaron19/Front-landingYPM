@@ -1,19 +1,20 @@
 import React from 'react';
 import { Trophy, Instagram, Facebook } from 'lucide-react';
 import logoImg from '../../../assets/yanapumas.png';
+import { resolveImageUrl } from '../figma/ImageWithFallback';
 
-export default function Footer({ setShowFullRoster }) {
+export default function Footer({ setShowFullRoster, clubInfo }) {
   return (
     <footer className="py-12 px-4 bg-[#0a0a0a] border-t border-[#FFD700]/20">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src={logoImg} alt="Yanapuma FC Logo" className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(255,215,0,0.25)]" />
+              <img src={resolveImageUrl(clubInfo?.logo_url, logoImg)} alt="Yanapuma FC Logo" className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(255,215,0,0.25)]" />
               <span className="text-2xl font-black text-[#FFD700] tracking-wider uppercase">YANAPUMA</span>
             </div>
             <p className="text-gray-400">
-              Fútbol femenino con pasión, garra y espíritu de equipo desde 2018.
+              {clubInfo?.descripcion || "Fútbol femenino con pasión, garra y espíritu de equipo desde 2018."}
             </p>
           </div>
           <div>
@@ -37,7 +38,7 @@ export default function Footer({ setShowFullRoster }) {
             <h3 className="font-semibold mb-4 text-[#FFD700]">Redes Sociales</h3>
             <div className="flex gap-4">
               <a 
-                href="https://www.instagram.com/club_yanapuma/" 
+                href={clubInfo?.instagram_url || "https://www.instagram.com/club_yanapuma/"} 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="w-10 h-10 bg-[#1a1a1a] rounded-full flex items-center justify-center hover:bg-[#FFD700] hover:text-black transition-all"
@@ -46,7 +47,7 @@ export default function Footer({ setShowFullRoster }) {
                 <Instagram className="w-5 h-5" />
               </a>
               <a 
-                href="https://www.facebook.com/clubyanapuma/photos?locale=es_LA" 
+                href={clubInfo?.facebook_url || "https://www.facebook.com/clubyanapuma/photos?locale=es_LA"} 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="w-10 h-10 bg-[#1a1a1a] rounded-full flex items-center justify-center hover:bg-[#FFD700] hover:text-black transition-all"

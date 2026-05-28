@@ -1,23 +1,29 @@
 import React, { useState } from 'react';
 import { X, Award, ShieldCheck, Check } from 'lucide-react';
 
-export default function MembershipModal({ isOpen, onClose }) {
+export default function MembershipModal({ isOpen, onClose, membershipsList = [] }) {
+  const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
+  const [telefono, setTelefono] = useState('');
+  const [observacion, setObservacion] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const [selectedTier, setSelectedTier] = useState('pantera');
+  const [selectedTier, setSelectedTier] = useState(null);
+  const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (email.trim()) {
-      setSubmitted(true);
-    }
-  };
-
-  const tiers = [
+  const tiers = membershipsList.length > 0 ? membershipsList.map((m) => ({
+    id: m.id,
+    slug: m.slug,
+    name: m.nombre,
+    price: `S/ ${m.precio} / ${m.periodo === 'Mensual' ? 'mes' : m.periodo}`,
+    accent: m.destacado ? 'border-[#FFD700] text-[#FFD700]' : 'border-zinc-800 text-zinc-400',
+    popular: m.destacado,
+    perks: m.beneficios ? m.beneficios.filter(b => b.activo).map(b => b.descripcion) : []
+  })) : [
     {
-      id: 'fiera',
+      id: 1,
+      slug: 'fiera',
       name: 'Fiera',
       price: '$5.00 / mes',
       accent: 'border-zinc-700 text-zinc-400',
@@ -28,7 +34,8 @@ export default function MembershipModal({ isOpen, onClose }) {
       ]
     },
     {
-      id: 'pantera',
+      id: 2,
+      slug: 'pantera',
       name: 'Pantera',
       price: '$12.00 / mes',
       accent: 'border-[#FFD700] text-[#FFD700]',
@@ -41,7 +48,8 @@ export default function MembershipModal({ isOpen, onClose }) {
       ]
     },
     {
-      id: 'yanapuma',
+      id: 3,
+      slug: 'yanapuma',
       name: 'Yanapuma VIP',
       price: '$25.00 / mes',
       accent: 'border-[#e6c200] text-[#FFD700]',
@@ -54,6 +62,42 @@ export default function MembershipModal({ isOpen, onClose }) {
       ]
     }
   ];
+
+  const activeTierId = selectedTier !== null ? selectedTier : (tiers.length > 0 ? tiers[0].id : 'pantera');
+  const activeTierObj = tiers.find(t => t.id === activeTierId) || tiers[0];
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    
+    if (nombre.trim() && email.trim()) {
+      try {
+        const response = await fetch('http://localhost:8000/api/membresias/solicitar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            membresia_id: typeof activeTierObj.id === 'number' ? activeTierObj.id : 1,
+            nombre: nombre,
+            email: email,
+            telefono: telefono || null,
+            observacion: observacion || null
+          }),
+        });
+
+        if (response.ok) {
+          setSubmitted(true);
+        } else {
+          const errData = await response.json();
+          setError(errData.message || 'Error al procesar la solicitud.');
+        }
+      } catch (err) {
+        console.error("Error submitting membership form:", err);
+        setError('No se pudo conectar con el servidor. Inténtelo de nuevo.');
+      }
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all">
@@ -95,7 +139,7 @@ export default function MembershipModal({ isOpen, onClose }) {
         {/* Right column: Tiers & Sign Up */}
         <div className="md:w-3/5 p-8 flex flex-col justify-between bg-black/40">
           {!submitted ? (
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="text-sm font-bold text-white mb-2 uppercase">Elige tu Membresía:</div>
 
               {/* Tiers list */}
@@ -105,7 +149,7 @@ export default function MembershipModal({ isOpen, onClose }) {
                     key={tier.id}
                     onClick={() => setSelectedTier(tier.id)}
                     className={`bg-[#0f0f0f] border-2 rounded-xl p-4 cursor-pointer hover:border-[#FFD700]/50 transition-all flex flex-col justify-between text-left relative ${
-                      selectedTier === tier.id ? 'border-[#FFD700] shadow-lg shadow-[#FFD700]/5 bg-[#121212]' : 'border-zinc-800'
+                      activeTierId === tier.id ? 'border-[#FFD700] shadow-lg shadow-[#FFD700]/5 bg-[#121212]' : 'border-zinc-800'
                     }`}
                   >
                     {tier.popular && (
@@ -137,25 +181,73 @@ export default function MembershipModal({ isOpen, onClose }) {
 
               {/* Sub Email Form */}
               <form onSubmit={handleSubmit} className="pt-4 border-t border-zinc-900 space-y-3">
-                <label className="block text-[10px] text-zinc-400 uppercase tracking-widest font-extrabold">
-                  Ingresa tu correo electrónico para postular
-                </label>
-                <div className="flex gap-2">
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[9px] text-zinc-400 uppercase tracking-widest font-extrabold mb-1">
+                      Nombre Completo
+                    </label>
+                    <input
+                      required
+                      type="text"
+                      value={nombre}
+                      onChange={(e) => setNombre(e.target.value)}
+                      placeholder="Tu nombre completo"
+                      className="w-full px-3 py-2 bg-[#101010] border border-[#FFD700]/20 rounded-lg text-xs text-white focus:outline-none focus:border-[#FFD700]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] text-zinc-400 uppercase tracking-widest font-extrabold mb-1">
+                      Teléfono (Opcional)
+                    </label>
+                    <input
+                      type="tel"
+                      value={telefono}
+                      onChange={(e) => setTelefono(e.target.value)}
+                      placeholder="+51 987 654 321"
+                      className="w-full px-3 py-2 bg-[#101010] border border-[#FFD700]/20 rounded-lg text-xs text-white focus:outline-none focus:border-[#FFD700]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[9px] text-zinc-400 uppercase tracking-widest font-extrabold mb-1">
+                    Correo Electrónico
+                  </label>
                   <input
                     required
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="ejemplo@correo.com"
-                    className="flex-1 px-4 py-2.5 bg-[#101010] border border-[#FFD700]/20 rounded-lg text-sm text-white focus:outline-none focus:border-[#FFD700]"
+                    className="w-full px-3 py-2 bg-[#101010] border border-[#FFD700]/20 rounded-lg text-xs text-white focus:outline-none focus:border-[#FFD700]"
                   />
-                  <button
-                    type="submit"
-                    className="px-6 py-2.5 bg-[#FFD700] hover:bg-[#e6c200] text-black font-bold text-xs uppercase tracking-wider rounded-lg transition-colors cursor-pointer"
-                  >
-                    Postular
-                  </button>
                 </div>
+
+                <div>
+                  <label className="block text-[9px] text-zinc-400 uppercase tracking-widest font-extrabold mb-1">
+                    Observaciones (Opcional)
+                  </label>
+                  <textarea
+                    rows={1.5}
+                    value={observacion}
+                    onChange={(e) => setObservacion(e.target.value)}
+                    placeholder="Comentarios adicionales"
+                    className="w-full px-3 py-1.5 bg-[#101010] border border-[#FFD700]/20 rounded-lg text-xs text-white focus:outline-none focus:border-[#FFD700]"
+                  />
+                </div>
+
+                {error && (
+                  <div className="text-red-500 text-[10px] font-bold bg-red-500/10 border border-red-500/30 rounded p-2">
+                    {error}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full py-2.5 bg-[#FFD700] hover:bg-[#e6c200] text-black font-bold text-xs uppercase tracking-wider rounded-lg transition-colors cursor-pointer"
+                >
+                  Enviar Postulación
+                </button>
               </form>
             </div>
           ) : (
@@ -166,13 +258,16 @@ export default function MembershipModal({ isOpen, onClose }) {
               <div className="space-y-2">
                 <h4 className="text-2xl font-black text-[#FFD700] uppercase tracking-wide">¡Solicitud Recibida!</h4>
                 <p className="text-zinc-300 text-sm max-w-sm mx-auto leading-relaxed">
-                  Hemos enviado los pasos de facturación digital y registro para el <strong>Tier {tiers.find(t => t.id === selectedTier).name}</strong> a <span className="text-[#FFD700] underline">{email}</span>.
+                  Hemos enviado los pasos de facturación digital y registro para el <strong>Tier {activeTierObj.name}</strong> a <span className="text-[#FFD700] underline">{email}</span>.
                 </p>
               </div>
               <button
                 onClick={() => {
                   setSubmitted(false);
+                  setNombre('');
                   setEmail('');
+                  setTelefono('');
+                  setObservacion('');
                   onClose();
                 }}
                 className="px-6 py-2 bg-[#FFD700] text-black font-extrabold text-xs uppercase tracking-wider rounded shadow-md hover:scale-105 active:scale-95 transition-all"

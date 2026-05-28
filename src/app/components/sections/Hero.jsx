@@ -2,41 +2,62 @@ import React, { useState, useEffect } from 'react';
 import { Sparkles, Trophy, Award } from 'lucide-react';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 
-export default function Hero({ heroBgImage, heroBgImage2, heroBgImage3 }) {
+export default function Hero({ heroBgImage, heroBgImage2, heroBgImage3, slidesList = [], announcementsList = [] }) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Auto transition every 4 seconds
   useEffect(() => {
+    const totalSlides = slidesList.length > 0 ? slidesList.length : 3;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 3);
+      setCurrentSlide((prev) => (prev + 1) % totalSlides);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slidesList]);
 
-  const slides = [
+  // Map icon strings to Lucide components
+  const getIcon = (name) => {
+    switch (name) {
+      case 'Trophy': return <Trophy className="w-3.5 h-3.5" />;
+      case 'Award': return <Award className="w-3.5 h-3.5" />;
+      default: return <Sparkles className="w-3.5 h-3.5" />;
+    }
+  };
+
+  const slides = slidesList.length > 0 ? slidesList.map((sl, index) => ({
+    image: sl.imagen_url || (index === 0 ? heroBgImage : index === 1 ? heroBgImage2 : heroBgImage3),
+    tag: sl.tag || 'Fútbol Femenino de Élite',
+    tagIcon: getIcon(sl.icono),
+    titleLine1: sl.titulo_linea_1 || 'YANA',
+    titleLine2: sl.titulo_linea_2 || 'PUMA FC',
+    subtitle: sl.subtitulo || 'La Fuerza de la Selva',
+    botones: sl.botones || []
+  })) : [
     {
-      image: heroBgImage, // First slide stays dynamic and customizable via customizer
+      image: heroBgImage,
       tag: 'Fútbol Femenino de Élite',
       tagIcon: <Sparkles className="w-3.5 h-3.5" />,
       titleLine1: 'YANA',
       titleLine2: 'PUMA FC',
       subtitle: 'Pasión, Garra e Identidad Inquebrantable en la Cancha',
+      botones: []
     },
     {
-      image: heroBgImage2, // Second slide customizable
+      image: heroBgImage2,
       tag: 'Espíritu Guerrero',
       tagIcon: <Trophy className="w-3.5 h-3.5" />,
       titleLine1: 'FUERZA',
       titleLine2: 'INDOMABLE',
       subtitle: 'Decididas a dejar nuestra huella en cada minuto del partido',
+      botones: []
     },
     {
-      image: heroBgImage3, // Third slide customizable
+      image: heroBgImage3,
       tag: 'El Clan de la Fiera',
       tagIcon: <Award className="w-3.5 h-3.5" />,
       titleLine1: 'UNIÓN Y',
       titleLine2: 'HONOR',
       subtitle: 'Nacidas para luchar, unidas y comprometidas para vencer',
+      botones: []
     }
   ];
 
@@ -88,18 +109,35 @@ export default function Hero({ heroBgImage, heroBgImage2, heroBgImage3 }) {
 
         {/* Action buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <a
-            href="#nosotras"
-            className="px-8 py-3.5 bg-gradient-to-r from-[#FFD700] to-[#e6c200] text-black font-black uppercase tracking-wider text-xs rounded-lg hover:scale-105 active:scale-95 transition-all text-center w-48 shadow-lg shadow-[#FFD700]/15 cursor-pointer"
-          >
-            Conocer Historia
-          </a>
-          <a
-            href="#contacto"
-            className="px-8 py-3.5 border border-[#FFD700] hover:bg-[#FFD700]/15 text-[#FFD700] font-black uppercase tracking-wider text-xs rounded-lg hover:scale-105 active:scale-95 transition-all text-center w-48 bg-black/60 cursor-pointer"
-          >
-            Contáctanos
-          </a>
+          {slides[currentSlide].botones && slides[currentSlide].botones.length > 0 ? (
+            slides[currentSlide].botones.map((btn, bIdx) => (
+              <a
+                key={bIdx}
+                href={btn.url}
+                className={btn.tipo === 'SECUNDARIO' 
+                  ? "px-8 py-3.5 border border-[#FFD700] hover:bg-[#FFD700]/15 text-[#FFD700] font-black uppercase tracking-wider text-xs rounded-lg hover:scale-105 active:scale-95 transition-all text-center w-48 bg-black/60 cursor-pointer"
+                  : "px-8 py-3.5 bg-gradient-to-r from-[#FFD700] to-[#e6c200] text-black font-black uppercase tracking-wider text-xs rounded-lg hover:scale-105 active:scale-95 transition-all text-center w-48 shadow-lg shadow-[#FFD700]/15 cursor-pointer"
+                }
+              >
+                {btn.texto}
+              </a>
+            ))
+          ) : (
+            <>
+              <a
+                href="#nosotras"
+                className="px-8 py-3.5 bg-gradient-to-r from-[#FFD700] to-[#e6c200] text-black font-black uppercase tracking-wider text-xs rounded-lg hover:scale-105 active:scale-95 transition-all text-center w-48 shadow-lg shadow-[#FFD700]/15 cursor-pointer"
+              >
+                Conocer Historia
+              </a>
+              <a
+                href="#contacto"
+                className="px-8 py-3.5 border border-[#FFD700] hover:bg-[#FFD700]/15 text-[#FFD700] font-black uppercase tracking-wider text-xs rounded-lg hover:scale-105 active:scale-95 transition-all text-center w-48 bg-black/60 cursor-pointer"
+              >
+                Contáctanos
+              </a>
+            </>
+          )}
         </div>
       </div>
 
@@ -120,15 +158,23 @@ export default function Hero({ heroBgImage, heroBgImage2, heroBgImage3 }) {
       {/* Moving ticker ribbon at the bottom of the section */}
       <div className="absolute bottom-0 w-full bg-gradient-to-r from-[#FFD700] via-[#e6c200] to-[#FFD700] text-black py-2.5 overflow-hidden z-20 font-black text-[9px] md:text-[10px] uppercase tracking-widest flex items-center shadow-2xl border-t border-[#FFD700]/25">
         <div className="whitespace-nowrap animate-marquee flex gap-16">
-          <span>⚡ ¡VENTA DE ENTRADAS ACTIVA PARA EL ENCUENTRO CONTRA LAS ÁGUILAS! ⚡</span>
-          <span>🏆 CLAN YANAPUMA FC: 8 AÑOS DE LUCHA Y TRIUNFOS 🏆</span>
-          <span>⚽ PRÓXIMA FECHA: LUNES 25 MAYO - 16:00 ⚽</span>
-          <span>🐾 #GARRAYANAPUMA: ÚNETE AL REGISTRO DE SOCIAS DIGITALES 🐾</span>
-          {/* Looped set to make marquee infinite */}
-          <span>⚡ ¡VENTA DE ENTRADAS ACTIVA PARA EL ENCUENTRO CONTRA LAS ÁGUILAS! ⚡</span>
-          <span>🏆 CLAN YANAPUMA FC: 8 AÑOS DE LUCHA Y TRIUNFOS 🏆</span>
-          <span>⚽ PRÓXIMA FECHA: LUNES 25 MAYO - 16:00 ⚽</span>
-          <span>🐾 #GARRAYANAPUMA: ÚNETE AL REGISTRO DE SOCIAS DIGITALES 🐾</span>
+          {announcementsList.length > 0 ? (
+            // Duplicate list to ensure continuous scrolling
+            [...announcementsList, ...announcementsList].map((ann, aIdx) => (
+              <span key={aIdx}>⚡ {ann.texto.toUpperCase()} ⚡</span>
+            ))
+          ) : (
+            <>
+              <span>⚡ ¡VENTA DE ENTRADAS ACTIVA PARA EL ENCUENTRO CONTRA LAS ÁGUILAS! ⚡</span>
+              <span>🏆 CLAN YANAPUMA FC: 8 AÑOS DE LUCHA Y TRIUNFOS 🏆</span>
+              <span>⚽ PRÓXIMA FECHA: LUNES 25 MAYO - 16:00 ⚽</span>
+              <span>🐾 #GARRAYANAPUMA: ÚNETE AL REGISTRO DE SOCIAS DIGITALES 🐾</span>
+              <span>⚡ ¡VENTA DE ENTRADAS ACTIVA PARA EL ENCUENTRO CONTRA LAS ÁGUILAS! ⚡</span>
+              <span>🏆 CLAN YANAPUMA FC: 8 AÑOS DE LUCHA Y TRIUNFOS 🏆</span>
+              <span>⚽ PRÓXIMA FECHA: LUNES 25 MAYO - 16:00 ⚽</span>
+              <span>🐾 #GARRAYANAPUMA: ÚNETE AL REGISTRO DE SOCIAS DIGITALES 🐾</span>
+            </>
+          )}
         </div>
       </div>
 

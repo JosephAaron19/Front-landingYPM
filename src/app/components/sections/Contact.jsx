@@ -1,16 +1,42 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, Sparkles, Terminal } from 'lucide-react';
 
-export default function Contact() {
+export default function Contact({ clubInfo }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     if (name.trim() && email.trim() && message.trim()) {
-      setSubmitted(true);
+      try {
+        const response = await fetch('http://localhost:8000/api/contacto', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            nombre: name,
+            email: email,
+            mensaje: message,
+            asunto: 'Contacto desde la Web',
+            telefono: '',
+          }),
+        });
+
+        if (response.ok) {
+          setSubmitted(true);
+        } else {
+          const errData = await response.json();
+          setError(errData.message || 'Error al enviar el mensaje.');
+        }
+      } catch (err) {
+        console.error("Error submitting contact form:", err);
+        setError('No se pudo conectar con el servidor. Inténtelo de nuevo.');
+      }
     }
   };
 
@@ -45,7 +71,7 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="font-extrabold text-[10px] text-zinc-500 uppercase tracking-widest">Escríbenos</h3>
-                <p className="text-sm font-semibold text-white mt-0.5">contacto@yanapuma.com</p>
+                <p className="text-sm font-semibold text-white mt-0.5">{clubInfo?.email || 'contacto@yanapuma.com'}</p>
               </div>
             </div>
 
@@ -56,7 +82,7 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="font-extrabold text-[10px] text-zinc-500 uppercase tracking-widest">Llámanos</h3>
-                <p className="text-sm font-semibold text-white mt-0.5">+593 99 123 4567</p>
+                <p className="text-sm font-semibold text-white mt-0.5">{clubInfo?.telefono || '+51 987 654 321'}</p>
               </div>
             </div>
 
@@ -67,7 +93,7 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="font-extrabold text-[10px] text-zinc-500 uppercase tracking-widest">Sede Oficial</h3>
-                <p className="text-sm font-semibold text-white mt-0.5">Iquitos, Loreto, Perú</p>
+                <p className="text-sm font-semibold text-white mt-0.5">{clubInfo?.direccion || 'Iquitos, Loreto, Perú'}</p>
               </div>
             </div>
 
@@ -117,6 +143,12 @@ export default function Contact() {
                     placeholder="Escribe tu consulta sobre entradas, plantel o convenios..."
                   ></textarea>
                 </div>
+
+                {error && (
+                  <div className="text-red-500 text-xs font-bold bg-red-500/10 border border-red-500/30 rounded p-2.5">
+                    {error}
+                  </div>
+                )}
 
                 <button 
                   type="submit"

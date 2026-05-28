@@ -1,7 +1,67 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Ticket, Flame, Trophy, Calendar, MapPin, Zap } from 'lucide-react';
+import { resolveImageUrl } from '../figma/ImageWithFallback';
 
-export default function ClubHighlights() {
+function TeamCrest({ url, name, initials, isYanapuma }) {
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [url]);
+
+  if (url && !hasError) {
+    return (
+      <div className="w-12 h-12 flex items-center justify-center">
+        <img 
+          src={resolveImageUrl(url)} 
+          alt={name} 
+          onError={() => setHasError(true)}
+          className={`w-12 h-12 object-contain hover:scale-105 transition-transform ${
+            isYanapuma 
+              ? "drop-shadow-[0_0_8px_rgba(255,215,0,0.4)]" 
+              : "drop-shadow-[0_0_8px_rgba(255,255,255,0.15)]"
+          }`}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className={`w-12 h-12 ${
+      isYanapuma 
+        ? "bg-[#FFD700] text-black shadow-lg shadow-[#FFD700]/10" 
+        : "bg-zinc-800 text-white border border-zinc-700"
+    } rounded-full flex items-center justify-center font-bold hover:scale-105 transition-transform`}>
+      {initials}
+    </div>
+  );
+}
+
+export default function ClubHighlights({ nextMatch }) {
+  const isLocal = nextMatch ? nextMatch.es_local : true;
+  
+  const localName = isLocal ? "Yanapuma FC" : (nextMatch ? nextMatch.equipo_local : "Yanapuma FC");
+  const localCrest = isLocal ? "YP" : (nextMatch ? nextMatch.equipo_local.substring(0, 2).toUpperCase() : "YP");
+  
+  const visitorName = isLocal ? (nextMatch ? nextMatch.equipo_visitante : "Águilas FC") : "Yanapuma FC";
+  const visitorCrest = isLocal ? (nextMatch ? nextMatch.equipo_visitante.substring(0, 2).toUpperCase() : "AE") : "YP";
+
+  const matchEstadio = nextMatch ? nextMatch.estadio : "Estadio Olímpico Municipal";
+  const matchTicketUrl = nextMatch ? (nextMatch.ticket_url || "https://passandgo.finatech.com.pe/") : "https://passandgo.finatech.com.pe/";
+
+  // Format Date
+  let formattedDateString = "Lunes, 25 Mayo 2026 - 16:00";
+  if (nextMatch) {
+    try {
+      const dateObj = new Date(nextMatch.fecha + 'T00:00:00');
+      const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+      const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+      const formattedDate = `${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+      const formattedTime = nextMatch.hora ? nextMatch.hora.substring(0, 5) : '15:00';
+      formattedDateString = `${formattedDate} - ${formattedTime}`;
+    } catch (err) {}
+  }
+
   return (
     <section className="relative py-20 px-4 bg-gradient-to-b from-black via-[#0d0d0d] to-[#121212] overflow-hidden border-t border-[#FFD700]/10">
       {/* Subtle Background Glows */}
@@ -28,22 +88,28 @@ export default function ClubHighlights() {
 
               <div className="text-center my-6">
                 <div className="flex items-center justify-center gap-6">
-                  {/* Team Crest A (Yanapuma) */}
+                  {/* Team Crest A (Local) */}
                   <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 bg-[#FFD700] text-black rounded-full flex items-center justify-center font-black shadow-lg shadow-[#FFD700]/10">
-                      YP
-                    </div>
-                    <span className="text-xs font-bold mt-2 text-white">Yanapuma</span>
+                    <TeamCrest 
+                      url={nextMatch?.escudo_local_url} 
+                      name={localName} 
+                      initials={localCrest} 
+                      isYanapuma={isLocal} 
+                    />
+                    <span className="text-xs font-bold mt-2 text-white">{localName}</span>
                   </div>
 
                   <span className="text-2xl font-black text-[#FFD700] italic">VS</span>
 
-                  {/* Team Crest B (Opponent) */}
+                  {/* Team Crest B (Visitor) */}
                   <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 bg-zinc-800 text-white rounded-full flex items-center justify-center font-bold border border-zinc-700">
-                      AE
-                    </div>
-                    <span className="text-xs font-bold mt-2 text-zinc-400">Águilas FC</span>
+                    <TeamCrest 
+                      url={nextMatch?.escudo_visitante_url} 
+                      name={visitorName} 
+                      initials={visitorCrest} 
+                      isYanapuma={!isLocal} 
+                    />
+                    <span className="text-xs font-bold mt-2 text-zinc-400">{visitorName}</span>
                   </div>
                 </div>
               </div>
@@ -51,17 +117,17 @@ export default function ClubHighlights() {
               <div className="space-y-3 pt-4 border-t border-dashed border-[#FFD700]/20">
                 <div className="flex items-center gap-2.5 text-xs text-gray-300">
                   <Calendar className="w-4 h-4 text-[#FFD700]" />
-                  <span>Lunes, 25 Mayo 2026 - 16:00</span>
+                  <span>{formattedDateString}</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-xs text-gray-300">
                   <MapPin className="w-4 h-4 text-[#FFD700]" />
-                  <span>Estadio Olímpico Municipal</span>
+                  <span>{matchEstadio}</span>
                 </div>
               </div>
             </div>
 
             <a 
-              href="https://passandgo.finatech.com.pe/" 
+              href={matchTicketUrl} 
               target="_blank" 
               rel="noopener noreferrer" 
               className="mt-8 w-full py-3 bg-[#FFD700] hover:bg-[#FFD700]/90 text-black font-extrabold text-xs uppercase tracking-wider rounded-lg shadow-lg transition-all active:scale-95 cursor-pointer text-center block"

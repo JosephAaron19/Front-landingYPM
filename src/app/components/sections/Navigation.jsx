@@ -9,8 +9,25 @@ export default function Navigation({
   setShowFullRoster,
   setIsMembershipModalOpen,
   clubInfo,
-  menusList = []
+  menusList = [],
+  navigateTo,
+  currentPath
 }) {
+  const handleAnchorClick = (e, href) => {
+    setShowFullRoster(false);
+    if (href.startsWith('#')) {
+      const isNotHome = currentPath !== '/' && currentPath !== '';
+      if (isNotHome) {
+        e.preventDefault();
+        navigateTo('/');
+        setTimeout(() => {
+          const el = document.querySelector(href);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 150);
+      }
+    }
+  };
+
   return (
     <header className="fixed top-0 w-full z-50">
       {/* Upper Utility Ribbon (inspired by Alianza Lima) */}
@@ -52,9 +69,9 @@ export default function Navigation({
           <div className="flex justify-between items-center h-16">
             
             {/* Logo */}
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => setShowFullRoster(false)}>
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setShowFullRoster(false); navigateTo('/'); }}>
               <img src={resolveImageUrl(clubInfo?.logo_url, logoImg)} alt="Yanapuma FC Logo" className="w-9 h-9 object-contain drop-shadow-[0_0_8px_rgba(255,215,0,0.25)] hover:scale-105 transition-transform" />
-              <span className="text-2xl font-black text-[#FFD700] tracking-wider uppercase">YANAPUMA</span>
+              <span className="text-xl sm:text-2xl font-black text-[#FFD700] tracking-wider uppercase">YANAPUMA</span>
             </div>
 
             {/* Desktop Menu links */}
@@ -65,7 +82,18 @@ export default function Navigation({
                     return (
                       <button 
                         key={menu.id}
-                        onClick={() => setShowFullRoster(true)} 
+                        onClick={() => { setShowFullRoster(true); navigateTo('/'); }} 
+                        className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors cursor-pointer"
+                      >
+                        {menu.label}
+                      </button>
+                    );
+                  }
+                  if (menu.href.startsWith('/noticias') || menu.label.toLowerCase() === 'noticias') {
+                    return (
+                      <button
+                        key={menu.id}
+                        onClick={() => { setShowFullRoster(false); navigateTo('/noticias'); }}
                         className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors cursor-pointer"
                       >
                         {menu.label}
@@ -77,7 +105,7 @@ export default function Navigation({
                       key={menu.id}
                       href={menu.href} 
                       className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors"
-                      onClick={() => setShowFullRoster(false)}
+                      onClick={(e) => handleAnchorClick(e, menu.href)}
                     >
                       {menu.label}
                     </a>
@@ -85,22 +113,28 @@ export default function Navigation({
                 })
               ) : (
                 <>
-                  <a href="#inicio" className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors">Inicio</a>
-                  <a href="#nosotras" className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors">Nosotras</a>
+                  <a href="#inicio" onClick={(e) => handleAnchorClick(e, '#inicio')} className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors">Inicio</a>
+                  <a href="#nosotras" onClick={(e) => handleAnchorClick(e, '#nosotras')} className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors">Nosotras</a>
                   <button 
-                    onClick={() => setShowFullRoster(true)} 
+                    onClick={() => { setShowFullRoster(true); navigateTo('/'); }} 
                     className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors cursor-pointer"
                   >
                     Plantel
                   </button>
-                  <a href="#partidos" className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors">Partidos</a>
-                  <a href="#galeria" className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors">Galería</a>
-                  <a href="#contacto" className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors">Contacto</a>
+                  <a href="#partidos" onClick={(e) => handleAnchorClick(e, '#partidos')} className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors">Partidos</a>
+                  <a href="#galeria" onClick={(e) => handleAnchorClick(e, '#galeria')} className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors">Galería</a>
+                  <button 
+                    onClick={() => { setShowFullRoster(false); navigateTo('/noticias'); }}
+                    className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors cursor-pointer"
+                  >
+                    Noticias
+                  </button>
+                  <a href="#contacto" onClick={(e) => handleAnchorClick(e, '#contacto')} className="text-sm font-bold uppercase tracking-wider hover:text-[#FFD700] transition-colors">Contacto</a>
                 </>
               )}
             </div>
 
-            {/* "HAZTE INCONDICIONAL" Button (inspired by Alianza's "HAZTE ÍNTIMO") */}
+            {/* "HAZTE INCONDICIONAL" Button */}
             <button
               onClick={() => setIsMembershipModalOpen(true)}
               className="hidden lg:flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#FFD700] to-[#e6c200] hover:scale-105 text-black font-black text-[10px] uppercase tracking-widest rounded shadow-lg shadow-[#FFD700]/10 active:scale-95 transition-all cursor-pointer"
@@ -129,7 +163,18 @@ export default function Navigation({
                     return (
                       <button 
                         key={menu.id}
-                        onClick={() => { setShowFullRoster(true); setMobileMenuOpen(false); }} 
+                        onClick={() => { setShowFullRoster(true); setMobileMenuOpen(false); navigateTo('/'); }} 
+                        className="block hover:text-[#FFD700] transition-colors text-left w-full cursor-pointer uppercase tracking-wider text-xs font-bold"
+                      >
+                        {menu.label}
+                      </button>
+                    );
+                  }
+                  if (menu.href.startsWith('/noticias') || menu.label.toLowerCase() === 'noticias') {
+                    return (
+                      <button
+                        key={menu.id}
+                        onClick={() => { setShowFullRoster(false); navigateTo('/noticias'); setMobileMenuOpen(false); }}
                         className="block hover:text-[#FFD700] transition-colors text-left w-full cursor-pointer uppercase tracking-wider text-xs font-bold"
                       >
                         {menu.label}
@@ -141,7 +186,7 @@ export default function Navigation({
                       key={menu.id}
                       href={menu.href} 
                       className="block hover:text-[#FFD700] transition-colors uppercase tracking-wider text-xs font-bold"
-                      onClick={() => { setShowFullRoster(false); setMobileMenuOpen(false); }}
+                      onClick={(e) => { handleAnchorClick(e, menu.href); setMobileMenuOpen(false); }}
                     >
                       {menu.label}
                     </a>
@@ -149,22 +194,28 @@ export default function Navigation({
                 })
               ) : (
                 <>
-                  <a href="#inicio" className="block hover:text-[#FFD700] transition-colors uppercase tracking-wider text-xs font-bold" onClick={() => setMobileMenuOpen(false)}>Inicio</a>
-                  <a href="#nosotras" className="block hover:text-[#FFD700] transition-colors uppercase tracking-wider text-xs font-bold" onClick={() => setMobileMenuOpen(false)}>Nosotras</a>
+                  <a href="#inicio" className="block hover:text-[#FFD700] transition-colors uppercase tracking-wider text-xs font-bold" onClick={(e) => { handleAnchorClick(e, '#inicio'); setMobileMenuOpen(false); }}>Inicio</a>
+                  <a href="#nosotras" className="block hover:text-[#FFD700] transition-colors uppercase tracking-wider text-xs font-bold" onClick={(e) => { handleAnchorClick(e, '#nosotras'); setMobileMenuOpen(false); }}>Nosotras</a>
                   <button 
-                    onClick={() => { setShowFullRoster(true); setMobileMenuOpen(false); }} 
+                    onClick={() => { setShowFullRoster(true); setMobileMenuOpen(false); navigateTo('/'); }} 
                     className="block hover:text-[#FFD700] transition-colors text-left w-full cursor-pointer uppercase tracking-wider text-xs font-bold"
                   >
                     Plantel
                   </button>
-                  <a href="#partidos" className="block hover:text-[#FFD700] transition-colors uppercase tracking-wider text-xs font-bold" onClick={() => setMobileMenuOpen(false)}>Partidos</a>
-                  <a href="#galeria" className="block hover:text-[#FFD700] transition-colors uppercase tracking-wider text-xs font-bold" onClick={() => setMobileMenuOpen(false)}>Galería</a>
-                  <a href="#contacto" className="block hover:text-[#FFD700] transition-colors uppercase tracking-wider text-xs font-bold" onClick={() => setMobileMenuOpen(false)}>Contacto</a>
+                  <a href="#partidos" className="block hover:text-[#FFD700] transition-colors uppercase tracking-wider text-xs font-bold" onClick={(e) => { handleAnchorClick(e, '#partidos'); setMobileMenuOpen(false); }}>Partidos</a>
+                  <a href="#galeria" className="block hover:text-[#FFD700] transition-colors uppercase tracking-wider text-xs font-bold" onClick={(e) => { handleAnchorClick(e, '#galeria'); setMobileMenuOpen(false); }}>Galería</a>
+                  <button 
+                    onClick={() => { setShowFullRoster(false); navigateTo('/noticias'); setMobileMenuOpen(false); }}
+                    className="block hover:text-[#FFD700] transition-colors text-left w-full cursor-pointer uppercase tracking-wider text-xs font-bold"
+                  >
+                    Noticias
+                  </button>
+                  <a href="#contacto" className="block hover:text-[#FFD700] transition-colors uppercase tracking-wider text-xs font-bold" onClick={(e) => { handleAnchorClick(e, '#contacto'); setMobileMenuOpen(false); }}>Contacto</a>
                 </>
               )}
               <button 
                 onClick={() => { setIsMembershipModalOpen(true); setMobileMenuOpen(false); }}
-                className="w-full py-2.5 mt-2 bg-[#FFD700] text-black text-xs font-black uppercase tracking-widest rounded flex items-center justify-center gap-1.5 active:scale-95"
+                className="w-full py-2.5 mt-2 bg-[#FFD700] text-black text-xs font-black uppercase tracking-widest rounded flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
               >
                 <Award className="w-4 h-4" />
                 Hazte Incondicional

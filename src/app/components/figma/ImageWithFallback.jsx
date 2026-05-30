@@ -18,7 +18,9 @@ export function resolveImageUrl(url, fallback = ERROR_IMG_SRC) {
     return trimmedUrl.startsWith('/') ? trimmedUrl : `/${trimmedUrl}`;
   }
   
-  const backendHost = 'http://localhost:8000';
+  const backendHost = import.meta.env.DEV
+    ? 'http://localhost:8002'
+    : (import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api', '') : window.location.origin);
   const cleanPath = trimmedUrl.startsWith('/') ? trimmedUrl : `/${trimmedUrl}`;
   return `${backendHost}${cleanPath}`;
 }

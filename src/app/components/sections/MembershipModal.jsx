@@ -10,6 +10,18 @@ export default function MembershipModal({ isOpen, onClose, membershipsList = [] 
   const [selectedTier, setSelectedTier] = useState(null);
   const [error, setError] = useState('');
 
+  const handleChangeTelefono = (e) => {
+    const val = e.target.value.replace(/\D/g, '');
+    let cleaned = val;
+    if (cleaned.startsWith('51') && cleaned.length > 9) {
+      cleaned = cleaned.substring(2);
+    }
+    if (cleaned.length > 0 && !cleaned.startsWith('9')) {
+      return;
+    }
+    setTelefono(cleaned.substring(0, 9));
+  };
+
   if (!isOpen) return null;
 
   const tiers = membershipsList.length > 0 ? membershipsList.map((m) => ({
@@ -70,9 +82,17 @@ export default function MembershipModal({ isOpen, onClose, membershipsList = [] 
     e.preventDefault();
     setError('');
     
+    if (telefono && telefono.length !== 9) {
+      setError('El número de teléfono celular debe tener exactamente 9 dígitos y empezar con 9.');
+      return;
+    }
+    
     if (nombre.trim() && email.trim()) {
       try {
-        const response = await fetch('http://localhost:8000/api/membresias/solicitar', {
+        const apiBase = import.meta.env.DEV
+          ? 'http://localhost:8002/api'
+          : (import.meta.env.VITE_API_BASE_URL || `${window.location.origin}/api`);
+        const response = await fetch(`${apiBase}/membresias/solicitar`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -106,7 +126,7 @@ export default function MembershipModal({ isOpen, onClose, membershipsList = [] 
         onClick={onClose}
       />
 
-      <div className="relative w-full max-w-4xl bg-[#0b0b0b] border border-[#FFD700]/30 rounded-2xl shadow-2xl overflow-hidden z-10 flex flex-col md:flex-row animate-scale-up">
+      <div className="relative w-full max-w-4xl bg-[#0b0b0b] border border-[#FFD700]/30 rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh] z-10 flex flex-col md:flex-row animate-scale-up">
         {/* Close Button */}
         <button 
           onClick={onClose}
@@ -202,8 +222,8 @@ export default function MembershipModal({ isOpen, onClose, membershipsList = [] 
                     <input
                       type="tel"
                       value={telefono}
-                      onChange={(e) => setTelefono(e.target.value)}
-                      placeholder="+51 987 654 321"
+                      onChange={handleChangeTelefono}
+                      placeholder="987654321"
                       className="w-full px-3 py-2 bg-[#101010] border border-[#FFD700]/20 rounded-lg text-xs text-white focus:outline-none focus:border-[#FFD700]"
                     />
                   </div>

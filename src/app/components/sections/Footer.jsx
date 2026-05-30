@@ -3,7 +3,22 @@ import { Trophy, Instagram, Facebook } from 'lucide-react';
 import logoImg from '../../../assets/yanapumas.png';
 import { resolveImageUrl } from '../figma/ImageWithFallback';
 
-export default function Footer({ setShowFullRoster, clubInfo }) {
+export default function Footer({ setShowFullRoster, clubInfo, navigateTo }) {
+  const handleAnchorClick = (e, href) => {
+    setShowFullRoster(false);
+    if (href.startsWith('#')) {
+      const isNotHome = window.location.pathname !== '/' && window.location.pathname !== '';
+      if (isNotHome) {
+        e.preventDefault();
+        navigateTo('/');
+        setTimeout(() => {
+          const el = document.querySelector(href);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 150);
+      }
+    }
+  };
+
   return (
     <footer className="py-12 px-4 bg-[#0a0a0a] border-t border-[#FFD700]/20">
       <div className="max-w-7xl mx-auto">
@@ -20,18 +35,26 @@ export default function Footer({ setShowFullRoster, clubInfo }) {
           <div>
             <h3 className="font-semibold mb-4 text-[#FFD700]">Enlaces Rápidos</h3>
             <ul className="space-y-2 text-gray-400">
-              <li><a href="#inicio" className="hover:text-[#FFD700] transition-colors">Inicio</a></li>
-              <li><a href="#nosotras" className="hover:text-[#FFD700] transition-colors">Nosotras</a></li>
+              <li><a href="#inicio" onClick={(e) => handleAnchorClick(e, '#inicio')} className="hover:text-[#FFD700] transition-colors">Inicio</a></li>
+              <li><a href="#nosotras" onClick={(e) => handleAnchorClick(e, '#nosotras')} className="hover:text-[#FFD700] transition-colors">Nosotras</a></li>
               <li>
                 <button 
-                  onClick={() => setShowFullRoster(true)} 
+                  onClick={() => { setShowFullRoster(true); navigateTo('/'); }} 
                   className="hover:text-[#FFD700] transition-colors text-left cursor-pointer"
                 >
                   Plantel
                 </button>
               </li>
-              <li><a href="#partidos" className="hover:text-[#FFD700] transition-colors">Partidos</a></li>
-              <li><a href="#galeria" className="hover:text-[#FFD700] transition-colors">Galería</a></li>
+              <li><a href="#partidos" onClick={(e) => handleAnchorClick(e, '#partidos')} className="hover:text-[#FFD700] transition-colors">Partidos</a></li>
+              <li><a href="#galeria" onClick={(e) => handleAnchorClick(e, '#galeria')} className="hover:text-[#FFD700] transition-colors">Galería</a></li>
+              <li>
+                <button 
+                  onClick={() => { setShowFullRoster(false); navigateTo('/noticias'); }}
+                  className="hover:text-[#FFD700] transition-colors text-left cursor-pointer"
+                >
+                  Noticias
+                </button>
+              </li>
             </ul>
           </div>
           <div>

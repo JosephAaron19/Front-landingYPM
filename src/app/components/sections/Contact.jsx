@@ -13,7 +13,10 @@ export default function Contact({ clubInfo }) {
     setError('');
     if (name.trim() && email.trim() && message.trim()) {
       try {
-        const response = await fetch('http://localhost:8000/api/contacto', {
+        const apiBase = import.meta.env.DEV
+          ? 'http://localhost:8002/api'
+          : (import.meta.env.VITE_API_BASE_URL || `${window.location.origin}/api`);
+        const response = await fetch(`${apiBase}/contacto`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

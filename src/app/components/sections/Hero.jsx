@@ -62,7 +62,7 @@ export default function Hero({ heroBgImage, heroBgImage2, heroBgImage3, slidesLi
   ];
 
   return (
-    <section id="inicio" className="relative h-[90vh] md:h-screen flex items-center justify-center overflow-hidden bg-black mt-[16px] md:mt-[40px]">
+    <section id="inicio" className="relative h-[90vh] md:h-screen flex items-center justify-center overflow-hidden bg-black pt-16 md:pt-24">
       
       {/* 1. Background Slide Images (Rendered together with absolute positioning and opacity crossfades) */}
       {slides.map((slide, index) => (
@@ -88,22 +88,22 @@ export default function Hero({ heroBgImage, heroBgImage2, heroBgImage3, slidesLi
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,215,0,0.02)_1px,transparent_1px)] bg-[size:100%_4px] z-10 pointer-events-none"></div>
 
       {/* 2. Centered Text content with radial contrast bubble mask (protects text legibility) */}
-      <div className="relative z-20 text-center px-4 max-w-4xl pt-10 select-none bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.75)_0%,rgba(0,0,0,0)_60%)] p-8 rounded-full">
+      <div className="relative z-20 text-center px-4 max-w-4xl pt-6 select-none bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0)_70%)] p-6 md:p-12 rounded-2xl">
         
         {/* Dynamic Tag */}
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-black/60 border border-[#FFD700]/30 text-[9px] uppercase tracking-widest text-[#FFD700] mb-5 transition-all">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-black/60 border border-[#FFD700]/30 text-[9px] uppercase tracking-widest text-[#FFD700] mb-4 transition-all">
           {slides[currentSlide].tagIcon}
           <span>{slides[currentSlide].tag}</span>
         </div>
 
         {/* Dynamic Glowing Title */}
-        <h1 className="text-5xl sm:text-6xl md:text-8xl font-black mb-4 tracking-tighter uppercase leading-none transition-all duration-500">
+        <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black mb-3 tracking-tighter uppercase leading-none transition-all duration-500">
           <span className="text-white drop-shadow-[0_4px_15px_rgba(0,0,0,1)]">{slides[currentSlide].titleLine1} </span>
           <span className="text-[#FFD700] drop-shadow-[0_0_30px_rgba(255,215,0,0.4)]">{slides[currentSlide].titleLine2}</span>
         </h1>
         
         {/* Dynamic Description */}
-        <p className="text-sm md:text-lg mb-10 text-zinc-200 uppercase tracking-widest font-extrabold max-w-2xl mx-auto leading-relaxed border-y border-[#FFD700]/25 py-3.5 drop-shadow-[0_2px_4px_rgba(0,0,0,1)] transition-all">
+        <p className="text-xs sm:text-sm md:text-base mb-6 md:mb-10 text-zinc-200 uppercase tracking-widest font-extrabold max-w-2xl mx-auto leading-relaxed border-y border-[#FFD700]/25 py-2.5 md:py-3.5 drop-shadow-[0_2px_4px_rgba(0,0,0,1)] transition-all">
           {slides[currentSlide].subtitle}
         </p>
 

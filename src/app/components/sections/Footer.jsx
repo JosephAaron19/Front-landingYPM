@@ -25,7 +25,7 @@ export default function Footer({ setShowFullRoster, clubInfo, navigateTo }) {
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src={resolveImageUrl(clubInfo?.logo_url, logoImg)} alt="Yanapuma FC Logo" className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(255,215,0,0.25)]" />
+              <img src={resolveImageUrl(clubInfo?.escudo_url || clubInfo?.logo_url, logoImg)} alt="Yanapuma FC Logo" className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(255,215,0,0.25)]" />
               <span className="text-2xl font-black text-[#FFD700] tracking-wider uppercase">YANAPUMA</span>
             </div>
             <p className="text-gray-400">

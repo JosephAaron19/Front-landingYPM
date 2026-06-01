@@ -70,7 +70,7 @@ export default function Navigation({
             
             {/* Logo */}
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setShowFullRoster(false); navigateTo('/'); }}>
-              <img src={resolveImageUrl(clubInfo?.logo_url, logoImg)} alt="Yanapuma FC Logo" className="w-9 h-9 object-contain drop-shadow-[0_0_8px_rgba(255,215,0,0.25)] hover:scale-105 transition-transform" />
+              <img src={resolveImageUrl(clubInfo?.escudo_url || clubInfo?.logo_url, logoImg)} alt="Yanapuma FC Logo" className="w-9 h-9 object-contain drop-shadow-[0_0_8px_rgba(255,215,0,0.25)] hover:scale-105 transition-transform" />
               <span className="text-xl sm:text-2xl font-black text-[#FFD700] tracking-wider uppercase">YANAPUMA</span>
             </div>
 
